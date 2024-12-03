@@ -1,46 +1,80 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Randomize;
 
-
-
-
-List<string> list = new List<string>();
+TextRenderer renderer = new TextRenderer();
 RandomContext context = new RandomContext();
 SerialPeaker serialPeaker = new SerialPeaker();
-MacroParser parser = new MacroParser();
-parser.RegisterMacro("s", () =>  serialPeaker.NextSerial().ToString());
 
-list.Add("Find the result of the following addition : ");
-list.Add("\n");
-list.Add(parser.RenderString("#s)"));
-list.Add(context.Next("A").ToString());
-list.Add(" + ");
-list.Add(context.Next("B").ToString());
-list.Add("\n");
-list.Add("Solution : ");
-list.Add((context.RecallValue("A") + context.RecallValue("B")).ToString());
+// Register the serial macro with the parser
+renderer.RegisterTextMacro("SerialNumber", (_) => serialPeaker.NextSerial().ToString());
+renderer.RegisterTextMacro("RandomInteger", (parameters) => context.GetNextRandomNumber(parameters[0]).ToString());
 
-foreach (string s in list) {
-    Console.Write(s);
+renderer.RegisterTextMacro("Result", (parameters) => {
+    return (context.RecallValue(parameters[0]) + context.RecallValue(parameters[1])).ToString();
+});
+
+
+renderer.AddLine("Find the result of the following addition : ");
+renderer.AddLine("\n");
+renderer.AddLine("#SerialNumber) ");
+renderer.AddLine("#RandomInteger$a + #RandomInteger$b");
+renderer.AddLine("\n");
+renderer.AddLine("Solution : #Result$a$b");
+
+
+renderer.Render();
+
+public class TextRenderer {
+    private List<string> _lines = new List<string>();
+    MacroParser _parser = new MacroParser();
+
+    public void RegisterTextMacro(string macro, Func<string[], string> action) {
+        _parser.RegisterMacro(macro, action);
+    }
+    
+    public void AddLine(string line) {
+        _lines.Add(_parser.RenderString(line));
+    }
+
+    public void Render() {
+        foreach (string line in _lines) {
+            Console.Write(line);
+        }
+    }
 }
 
+// This class is used to parse a string and replace macros with
+// the appropriate values. The macros are defined by the user
+// and are stored in a dictionary. The dictionary maps the macro
+// name to a function that returns the value of the macro
 public class MacroParser {
-    Dictionary<string, Func<string>> m_macros = new Dictionary<string, Func<string>>();
+    Dictionary<string, Func<string[], string>> m_textMacros = new Dictionary<string, Func<string[], string>>();
 
-    private static readonly Regex MacroRegex = new Regex(@"#(\w+)");
-    
-    public void RegisterMacro(string name, Func<string> action) {
-        m_macros[name] = action;
+    // This regular expression is used to match a macro in the input string
+    // The macro is defined by a '#' followed by the macro name, and an optional
+    // list of parameters separated by '$'
+    // For example, the string '#s$param1$param2' will match the macro name 's',
+    // and the parameters will be ['param1', 'param2']
+    private static readonly Regex MacroRegex = new Regex(@"^#(\w+)(?:\$(\w+))*");
+
+
+    public MacroParser() { }
+
+    // This method is used to register a macro with the parser.
+    public void RegisterMacro(string name, Func<string[], string> action) {
+        m_textMacros[name] = action;
     }
 
     public string RenderString(string input) {
         // Read the string and replace the macros with the appropriate values
         // Use the m_macros dictionary to look up the action for each macro
 
+        // The result string will be built up as we process the input string
         StringBuilder result = new StringBuilder();
+
+        // The position variable is used to keep track of the current position
+        // in the input string
         int position = 0;
 
         while (position < input.Length) {
@@ -49,7 +83,28 @@ public class MacroParser {
             Match match;
             // Check for macro
             if ((match = MacroRegex.Match(remainingText)).Success) {
-                result.Append(m_macros[match.Groups[1].Value]());
+                string macroName = match.Groups[1].Value;
+
+                /* Explanation of the following line of code:
+                 * Get the parameters for the macro (if any) and call the action
+                 * If the input string is "#s$param1$param2", and the regular expression
+                 * matches this string, the Groups collection might look like this:
+                   •	Groups[0]: "#s$param1$param2" (entire match)
+                   •	Groups[1]: "s" (macro name)
+                   •	Groups[2]: "param1" (first parameter)
+                   •	Groups[3]: "param2" (second parameter)
+                   After applying the line of code:
+                   •	parameters will be an array containing ["param1", "param2"].
+                   This array is then used to call the macro's action function, which 
+                   generates the replacement value for the macro in the input string.
+                Cast converts the CaptureCollection to an IEnumerable<Capture> to 
+                enable LINQ expressions and Select projects each Capture to its Value
+                property.
+                 */
+                string[] parameters = match.Groups[2].Captures.
+                    Cast<Capture>().Select(c => c.Value).ToArray();
+
+                result.Append(m_textMacros[macroName](parameters));
                 position += match.Length;
             }
             // Plain text

@@ -9,7 +9,7 @@ for( int i = -10; i <= 10; i++) {
     distribution[i] = 0;
 }
 
-foreach (int i in context.NextN_Random_Method(1000,-10,11)) {
+foreach (int i in context.NextN_Random_Numbers(1000,-10,11)) {
     if (distribution.ContainsKey(i)) {
         distribution[i]++;
     } else {
@@ -18,7 +18,7 @@ foreach (int i in context.NextN_Random_Method(1000,-10,11)) {
     Console.WriteLine(i);
 }
 
-foreach (KeyValuePair<int,int> kvp in distribution) {
+/*foreach (KeyValuePair<int,int> kvp in distribution) {
     Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
 }
 
@@ -62,4 +62,4 @@ foreach (int i in RandomContext.NextN_MersenneTwister_Method(100, -10, 10)) {
 
 foreach (KeyValuePair<int, int> kvp in distribution3) {
     Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
-}
+}*/
