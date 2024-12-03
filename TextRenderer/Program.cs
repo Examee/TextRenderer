@@ -20,9 +20,7 @@ renderer.AddLine("\n");
 renderer.AddLine("#SerialNumber) ");
 renderer.AddLine("#RandomInteger$a + #RandomInteger$b");
 renderer.AddLine("\n");
-renderer.AddLine("Solution : #Result$a$b");
-
-
+renderer.AddLine("Solution to exercise #SerialNumber : #Result$a$b");
 renderer.Render();
 
 public class TextRenderer {
@@ -104,7 +102,10 @@ public class MacroParser {
                 string[] parameters = match.Groups[2].Captures.
                     Cast<Capture>().Select(c => c.Value).ToArray();
 
+                // Call the action function for the macro and append the result to the output
                 result.Append(m_textMacros[macroName](parameters));
+
+                // Move the position to the end of the matched macro
                 position += match.Length;
             }
             // Plain text
