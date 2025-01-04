@@ -37,26 +37,43 @@ namespace TextRenderer3 {
             }
         }
 
+
+
         public void AddQuestion(string questionid, int multiplicity, Action<CScopeSystem> initAction) {
             // Find the Exam block to add the question to
-            CExam exam = m_currentBlock.GetExam();
-            m_scopeSystem.SetCurrentScope("Exam");
+            var exam = PassToQuestionParentEnvironment();
 
+            // Render the question ID using the macros of the parent scope
             string questionID = m_macroParser.RenderString(MCurrentScope,questionid);
 
             // Create question and append it to the exam
-            CQuestion question = new CQuestion(questionID, m_currentBlock);
-            exam.AddBlock(question, CExam.QUESTION);
-            m_currentBlock = question;
+            CreateQuestion();
 
             // Change to question scope 
-            m_scopeSystem.EnterScope(questionID, MCurrentScope);
+            SetQuestionEnvironment();
 
             // Initialize services for the question scope
             if (initAction != null) {
                 initAction(m_scopeSystem);
             }
+            void CreateQuestion() {
+                CQuestion question = new CQuestion(questionID, m_currentBlock);
+                exam.AddBlock(question, CExam.QUESTION);
+                m_currentBlock = question;
+            }
+
+            CExam PassToQuestionParentEnvironment() {
+                CExam exam = m_currentBlock.GetExam();
+                m_scopeSystem.SetCurrentScope("Exam");
+                return exam;
+            }
+
+            void SetQuestionEnvironment() {
+                m_scopeSystem.EnterScope(questionID, MCurrentScope);
+            }
         }
+
+        
 
         public void AddSolution(string questionID) {
 
