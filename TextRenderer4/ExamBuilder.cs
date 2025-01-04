@@ -17,7 +17,9 @@ namespace TextRenderer3 {
 
         CMacroParser m_macroParser;
 
-        
+        CScope MCurrentScope => m_scopeSystem.MCurrentScope;
+
+
         public CExamBuilder() {
             m_scopeSystem = CScopeSystem.Instance;
             m_macroParser = CMacroParser.Instance;
@@ -38,8 +40,9 @@ namespace TextRenderer3 {
         public void AddQuestion(string questionid, int multiplicity, Action<CScopeSystem> initAction) {
             // Find the Exam block to add the question to
             CExam exam = m_currentBlock.GetExam();
+            m_scopeSystem.SetCurrentScope("Exam");
 
-            string questionID = m_macroParser.RenderString(exam.MScope,questionid);
+            string questionID = m_macroParser.RenderString(MCurrentScope,questionid);
 
             // Create question and append it to the exam
             CQuestion question = new CQuestion(questionID, m_currentBlock);
@@ -47,7 +50,7 @@ namespace TextRenderer3 {
             m_currentBlock = question;
 
             // Change to question scope 
-            m_scopeSystem.EnterScope(questionID, m_scopeSystem.MCurrentScope);
+            m_scopeSystem.EnterScope(questionID, MCurrentScope);
 
             // Initialize services for the question scope
             if (initAction != null) {
