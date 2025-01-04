@@ -1,20 +1,34 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Randomize;
+using TextRenderer;
 
-TextRenderer renderer = new TextRenderer();
+CScopeSystem scopeSystem = new CScopeSystem();
+CTextRenderer renderer = new CTextRenderer();
 RandomContext context = new RandomContext();
 SerialPeaker serialPeaker = new SerialPeaker();
 
 // Register the serial macro with the parser
-renderer.RegisterTextMacro("SerialNumber", (_) => serialPeaker.NextSerial().ToString());
-renderer.RegisterTextMacro("RandomInteger", (parameters) => context.GetNextRandomNumber(parameters[0]).ToString());
+renderer.RegisterTextMacro("SerialNumber", (_) =>
+    serialPeaker.NextSerial().ToString());
+renderer.RegisterTextMacro("RandomInteger", (parameters) =>
+    context.GetNextRandomNumber(parameters[0]).ToString());
 
 renderer.RegisterTextMacro("Result", (parameters) => {
-    return (context.RecallValue(parameters[0]) + context.RecallValue(parameters[1])).ToString();
+    return (context.RecallValue(parameters[0]) + 
+            context.RecallValue(parameters[1])).ToString();
 });
 
+renderer.RegisterTextMacro("Question", (parameters) => {
 
+    // Create a new scope for the question
+
+    // Set the multiplicity of the question
+
+    return "";
+});
+
+renderer.AddQuestion(5);
 renderer.AddLine("Find the result of the following addition : ");
 renderer.AddLine("\n");
 renderer.AddLine("#SerialNumber) ");
@@ -23,16 +37,23 @@ renderer.AddLine("\n");
 renderer.AddLine("Solution to exercise #SerialNumber : #Result$a$b");
 renderer.Render();
 
-public class TextRenderer {
-    private List<string> _lines = new List<string>();
-    MacroParser _parser = new MacroParser();
+
+// Acts as builder for the exam questions
+public class CTextRenderer {
+    private List< string> _lines = new List<string>();
+    CMacroParser _parser = new CMacroParser();
 
     public void RegisterTextMacro(string macro, Func<string[], string> action) {
         _parser.RegisterMacro(macro, action);
     }
     
     public void AddLine(string line) {
-        _lines.Add(_parser.RenderString(line));
+        string lineText = _parser.RenderString(line);
+        _lines.Add(lineText);
+    }
+
+    public void AddQuestion(int multiplicity) {
+
     }
 
     public void Render() {
@@ -46,7 +67,11 @@ public class TextRenderer {
 // the appropriate values. The macros are defined by the user
 // and are stored in a dictionary. The dictionary maps the macro
 // name to a function that returns the value of the macro
-public class MacroParser {
+public class CMacroParser {
+    // This dictionary is used to store the macros and their
+    // corresponding actions. The key is the macro name, and the
+    // value is a function that takes an array of strings as input
+    // and returns a string.
     Dictionary<string, Func<string[], string>> m_textMacros = new Dictionary<string, Func<string[], string>>();
 
     // This regular expression is used to match a macro in the input string
@@ -57,7 +82,7 @@ public class MacroParser {
     private static readonly Regex MacroRegex = new Regex(@"^#(\w+)(?:\$(\w+))*");
 
 
-    public MacroParser() { }
+    public CMacroParser() { }
 
     // This method is used to register a macro with the parser.
     public void RegisterMacro(string name, Func<string[], string> action) {

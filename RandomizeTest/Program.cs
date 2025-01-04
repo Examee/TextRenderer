@@ -62,4 +62,4 @@ foreach (int i in RandomContext.NextN_MersenneTwister_Method(100, -10, 10)) {
 
 foreach (KeyValuePair<int, int> kvp in distribution3) {
     Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
-}*/
+}

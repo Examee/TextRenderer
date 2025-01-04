@@ -4,7 +4,8 @@ using MathNet.Numerics.Random;
 namespace Randomize {
 
 
-
+    // Random Context class is used to generate random integers
+    // and store them in a dictionary. 
     public class RandomContext {
         private Random random;
         Dictionary<string, int> distribution = new Dictionary<string, int>();

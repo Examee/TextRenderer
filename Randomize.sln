@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer", "TextRendere
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer2", "TextRenderer2\TextRenderer2.csproj", "{5D770227-2623-4A33-A360-EB5C1E4AB6CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer4", "TextRenderer4\TextRenderer4.csproj", "{C4C6F71D-2A34-427C-A7DD-E30A2126A869}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5D770227-2623-4A33-A360-EB5C1E4AB6CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D770227-2623-4A33-A360-EB5C1E4AB6CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D770227-2623-4A33-A360-EB5C1E4AB6CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

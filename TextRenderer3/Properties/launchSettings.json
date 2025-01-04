@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TextRenderer3": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
