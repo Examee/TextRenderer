@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextRenderer4;
 
 namespace TextRenderer3 {
+    // Represents a block of text in the exam
     public abstract class CExamBlock {
         public CExamBlock MParent { get; }
 
@@ -13,16 +15,16 @@ namespace TextRenderer3 {
         public CExamBlock(CExamBlock mParent) {
             MParent = mParent;
         }
-        internal abstract void AddBlock(CExamBlock block, int type = 0);
-
+        
         public abstract string GetContent();
 
-        public CExam GetExam() {
+        public T GetParent<T>() where T:class {
             CExamBlock block = this;
-            while (block.MParent != null) {
+            while (block.MParent !=null &&
+                   block.MParent is T) {
                 block = block.MParent;
             }
-            return (CExam)block;
+            return block as T;
         }
     }
 
@@ -37,7 +39,15 @@ namespace TextRenderer3 {
             MNumberOfContexts = numContexts;
         }
 
-        internal override void AddBlock(CExamBlock block, int context) {
+        public override string GetContent() {
+            StringBuilder content = new StringBuilder();
+            for (int context = 0; context < m_content.Length; context++) {
+                content.Append(GetContextContent(context));
+            }
+            return content.ToString();
+        }
+
+        internal virtual void AddBlock(CExamBlock block, int context) {
             if (context < m_content.Length) {
                 if (m_content[context] == null) {
                     m_content[context] = new List<CExamBlock>();
@@ -48,20 +58,32 @@ namespace TextRenderer3 {
             }
         }
 
-        public override string GetContent() {
-            StringBuilder content = new StringBuilder();
-            for (int context = 0; context < m_content.Length; context++) {
-                content.Append(GetContextContent(context));
-            }
-            return content.ToString();
-        }
-
-        public string GetContextContent(int context) {
+        private string GetContextContent(int context) {
             StringBuilder content = new StringBuilder();
             foreach (CExamBlock block in m_content[context]) {
                 content.Append(block.ToString());
             }
             return content.ToString();
         }
+    }
+
+    public class CText : CExamBlock {
+        StringBuilder m_text = new StringBuilder();
+        public CText(CExamBlock parent) : base(parent) {
+        }
+        
+        public void AddLine(string text) {
+            m_text.AppendLine(text);
+        }
+        public void AddText(string text) {
+            m_text.Append(text);
+        }
+        public void AddNewLine() {
+            m_text.AppendLine();
+        }
+        public override string GetContent() {
+            return m_text.ToString();
+        }
+
     }
 }

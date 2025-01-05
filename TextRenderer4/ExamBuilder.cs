@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextRenderer4;
 
 namespace TextRenderer3 {
+
     public class CExamBuilder {
         // The root of the exam
         private CExam m_root;
@@ -37,11 +39,11 @@ namespace TextRenderer3 {
             }
         }
 
-
-
         public void AddQuestion(string questionid, int multiplicity, Action<CScopeSystem> initAction) {
             // Find the Exam block to add the question to
-            var exam = PassToQuestionParentEnvironment();
+            // includes the block and the scope. The exam scope
+            // is used for numbering questions using the serial picker
+            var exam = SwitchToExamEnvironment();
 
             // Render the question ID using the macros of the parent scope
             string questionID = m_macroParser.RenderString(MCurrentScope,questionid);
@@ -62,8 +64,8 @@ namespace TextRenderer3 {
                 m_currentBlock = question;
             }
 
-            CExam PassToQuestionParentEnvironment() {
-                CExam exam = m_currentBlock.GetExam();
+            CExam SwitchToExamEnvironment() {
+                CExam exam = m_currentBlock.GetParent<CExam>();
                 m_scopeSystem.SetCurrentScope("Exam");
                 return exam;
             }
@@ -71,21 +73,6 @@ namespace TextRenderer3 {
             void SetQuestionEnvironment() {
                 m_scopeSystem.EnterScope(questionID, MCurrentScope);
             }
-        }
-
-        
-
-        public void AddSolution(string questionID) {
-
-        }
-
-
-        public void AddLine(string line) {
-
-        }
-
-        public void Render() {
-
         }
     }
 }
