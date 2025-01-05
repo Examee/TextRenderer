@@ -22,10 +22,16 @@ namespace TextRenderer4 {
         private string m_questionId;
         public string MQuestionId => m_questionId;
 
-        public CQuestion(string questionID, CExamBlock parent) : base(2, parent) {
+        public CQuestion(string questionID, CExam parent) : base(2, parent) {
             m_questionId = questionID;
+            parent.AddBlock(this, CExam.QUESTION);
         }
 
-        
+        public override string GetContent() {
+            StringBuilder content = new StringBuilder();
+            content.Append(GetContextContent(QUESTION_SET) + ") ");
+            content.Append(GetContextContent(TEXT));
+            return content.ToString();
+        }
     }
 }

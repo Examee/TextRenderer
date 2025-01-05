@@ -16,7 +16,9 @@ examBuilder.AddExam((scopesystem) => {
 });
 
 examBuilder.AddQuestion("#QuestionCounter",5,null);
+examBuilder.AddTextLine("Find the result of the following addition : ");
 examBuilder.AddQuestion("#QuestionCounter",5, null);
+Console.WriteLine(examBuilder.RenderExam());
 /*
 examBuilder.AddLine("Find the result of the following addition : ");
 examBuilder.AddLine("\n");

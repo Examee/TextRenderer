@@ -36,6 +36,9 @@ namespace TextRenderer3 {
 
         public CExamCompositeBlock(int numContexts, CExamBlock parent) : base(parent) {
             m_content = new List<CExamBlock>[numContexts];
+            for (int i = 0; i < numContexts; i++) {
+                m_content[i] = new List<CExamBlock>();
+            }
             MNumberOfContexts = numContexts;
         }
 
@@ -58,10 +61,10 @@ namespace TextRenderer3 {
             }
         }
 
-        private string GetContextContent(int context) {
+        protected string GetContextContent(int context) {
             StringBuilder content = new StringBuilder();
             foreach (CExamBlock block in m_content[context]) {
-                content.Append(block.ToString());
+                content.Append(block.GetContent());
             }
             return content.ToString();
         }
@@ -69,9 +72,10 @@ namespace TextRenderer3 {
 
     public class CText : CExamBlock {
         StringBuilder m_text = new StringBuilder();
-        public CText(CExamBlock parent) : base(parent) {
+        public CText(CExamCompositeBlock parent, int context) : base(parent) {
+            parent.AddBlock(this, context);
         }
-        
+
         public void AddLine(string text) {
             m_text.AppendLine(text);
         }
