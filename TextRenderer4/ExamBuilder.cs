@@ -98,7 +98,8 @@ namespace TextRenderer3 {
 
         public CText AddText(string text) {
 
-            CText textBlock = new CText(m_currentBlock as CExamCompositeBlock,0);
+            CText textBlock = 
+                new CText(m_currentBlock as CExamCompositeBlock,0);
             
             string _text = m_macroParser.RenderString(MCurrentScope, text);
             textBlock.AddText(_text);
@@ -106,12 +107,18 @@ namespace TextRenderer3 {
             return textBlock;
         }
 
-        public string AddTextLine(string text) {
-            var textBlock = AddText(text);
-            textBlock.AddNewLine();
-            return text;
+        public void AddNewLine() {
+            CNewLine newLine = 
+                new CNewLine(m_currentBlock as CExamCompositeBlock, 0);
+            return;
         }
 
+        public string AddTextLine(string text) {
+            var textBlock = AddText(text);
+            AddNewLine();
+            return text;
+        }
+        
         public string RenderExam() {
             return m_root.GetContent();
         }

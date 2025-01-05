@@ -82,12 +82,19 @@ namespace TextRenderer3 {
         public void AddText(string text) {
             m_text.Append(text);
         }
-        public void AddNewLine() {
-            m_text.AppendLine();
-        }
         public override string GetContent() {
             return m_text.ToString();
         }
+    }
 
+    public class CNewLine : CExamBlock {
+        public CNewLine(CExamCompositeBlock mParent,
+            int context) : base(mParent) {
+            mParent.AddBlock(this, context);
+        }
+
+        public override string GetContent() {
+            return "\n";
+        }
     }
 }
