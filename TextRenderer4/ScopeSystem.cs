@@ -94,6 +94,8 @@ namespace TextRenderer3 {
         // and the second to the name of the object in that namespace
         private Dictionary<string, Func<string[], string>> m_symbolTableMacros;
 
+        public Dictionary<string, string> m_symbolTable;
+
         // The parent symbol table is used to search for objects in the parent
         // scope if they are not found in the current scope
         private CScope m_parent;
@@ -105,8 +107,19 @@ namespace TextRenderer3 {
 
         public CScope(string scopeID,CScope parent) {
             m_symbolTableMacros = new Dictionary<string, Func<string[], string>>();
+            m_symbolTable = new Dictionary<string, string>();
             m_parent = parent;
             m_scopeID = scopeID;
+        }
+
+        public void AddValue(string key, string value) {
+            m_symbolTable[key] = value;
+        }
+        public string GetValue(string key) {
+            if (m_symbolTable.ContainsKey(key)) {
+                return m_symbolTable[key];
+            }
+            throw new KeyNotFoundException("Object not found");
         }
 
         public void AddMacro(string objectName, Func<string[], string> action) {

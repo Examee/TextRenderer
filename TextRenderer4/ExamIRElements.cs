@@ -34,4 +34,17 @@ namespace TextRenderer4 {
             return content.ToString();
         }
     }
+
+    public class CSolution : CExamCompositeBlock {
+        public const int TEXT = 0, SOLUTION_SET = 1;
+        public CSolution(CExam parent) : base(2, parent) {
+            parent.AddBlock(this, CExam.SOLUTION);
+        }
+        public override string GetContent() {
+            StringBuilder content = new StringBuilder();
+            content.Append(GetContextContent(SOLUTION_SET) + ") ");
+            content.Append(GetContextContent(TEXT));
+            return content.ToString();
+        }
+    }
 }

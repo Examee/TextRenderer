@@ -3,13 +3,13 @@
 
 using Randomize;
 Dictionary<int, int> distribution = new Dictionary<int,int>();
-RandomContext context = new RandomContext();
+CRandomIntegerContext integerContext = new CRandomIntegerContext();
 
 for( int i = -10; i <= 10; i++) {
     distribution[i] = 0;
 }
 
-foreach (int i in context.NextN_Random_Numbers(1000,-10,11)) {
+foreach (int i in integerContext.NextN_Random_Numbers(1000,-10,11)) {
     if (distribution.ContainsKey(i)) {
         distribution[i]++;
     } else {
@@ -33,7 +33,7 @@ for( int i = -10; i <= 10; i++) {
     distribution2[i] = 0;
 }
 
-foreach (int i in RandomContext.NextN_RandomGenerator_Method(100, -10, 10)) {
+foreach (int i in RandomIntegerContext.NextN_RandomGenerator_Method(100, -10, 10)) {
     if (distribution2.ContainsKey(i)) {
         distribution2[i]++;
     } else {
@@ -51,7 +51,7 @@ for (int i = -10; i <= 10; i++) {
     distribution3[i] = 0;
 }
 
-foreach (int i in RandomContext.NextN_MersenneTwister_Method(100, -10, 10)) {
+foreach (int i in RandomIntegerContext.NextN_MersenneTwister_Method(100, -10, 10)) {
     if (distribution3.ContainsKey(i)) {
         distribution3[i]++;
     } else {

@@ -57,7 +57,8 @@ namespace TextRenderer3 {
             var exam = SwitchToExamEnvironment();
 
             // Render the question ID using the macros of the parent scope
-            string questionID = m_macroParser.RenderString(MCurrentScope,questionid);
+            string symtabId;
+            string questionID = m_macroParser.RenderString(MCurrentScope,questionid,out symtabId);
 
             // Create question and append it to the exam
             CreateQuestion(exam,questionID);
@@ -87,11 +88,29 @@ namespace TextRenderer3 {
             }
 
             void SetQuestionEnvironment() {
-                m_scopeSystem.EnterScope(questionID, MCurrentScope);
+                m_scopeSystem.EnterScope(symtabId, MCurrentScope);
             }
         }
 
         public string AddSolution(string questionID, Action<CScopeSystem> initAction) {
+
+            CExam exam = m_currentBlock.GetParent<CExam>();
+            m_scopeSystem.SetCurrentScope("Exam");
+            
+            // Create Solution
+            CSolution solution = new CSolution(exam);
+            m_currentBlock = solution;
+
+            // Switch to question environment
+
+            m_scopeSystem.SetCurrentScope(questionID);
+
+            // Add the question ID to the text block
+            CText textBlock = new CText(m_currentBlock as CExamCompositeBlock, 1);
+            textBlock.AddText(questionID);
+
+            // Initialize services for the solution scope
+            InitializeServices(initAction);
 
             return questionID;
         }
@@ -100,8 +119,8 @@ namespace TextRenderer3 {
 
             CText textBlock = 
                 new CText(m_currentBlock as CExamCompositeBlock,0);
-            
-            string _text = m_macroParser.RenderString(MCurrentScope, text);
+
+            string _text = m_macroParser.RenderString(MCurrentScope, text,out _);
             textBlock.AddText(_text);
 
             return textBlock;

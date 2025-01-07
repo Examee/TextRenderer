@@ -1,18 +1,22 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using MathNet.Numerics.Random;
 
 namespace Randomize {
+    public interface IRandomIntegerContext {
+        int GetNextRandomNumber();
+       IEnumerable<int> NextN_Random_Numbers(int N, int min, int max);
+        List<T> SampleWithReplacement<T>(IList<T> source, int sampleSize);
+    }
 
-
-    // Random Context class is used to generate random integers
-    // and store them in a dictionary. 
-    public class RandomContext {
-        private Random random;
-        Dictionary<string, int> distribution = new Dictionary<string, int>();
-        public RandomContext() {
+    public class CRandomIntegerContext : IRandomIntegerContext {
+        
+        protected Random random;
+        
+        public CRandomIntegerContext() {
             random = new Random();
         }
-        public RandomContext(int seed) {
+        public CRandomIntegerContext(int seed) {
             random = new Random(seed);
         }
 
@@ -20,20 +24,9 @@ namespace Randomize {
         // between 0 and 10. It also stores the generated
         // number in the distribution dictionary with the
         // key recall_name.
-        public int GetNextRandomNumber(string recall_name=null) {
+        public int GetNextRandomNumber() {
             int result = random.Next(10);
-            if (recall_name != null) {
-                distribution[recall_name] = result;
-            }
             return result;
-        }
-
-        // This method is used to recall the value of a
-        // previously generated random number. The recall_name
-        // is used to look up the value in the distribution
-        // dictionary.
-        public int RecallValue(string recall_name) {
-            return distribution[recall_name];
         }
 
         // This method is used to generate N random numbers
@@ -70,6 +63,31 @@ namespace Randomize {
                 .Select(_ => source[random.Next(source.Count)])
                 .ToList();
         }
+    }
 
+    public class CRandomIntegerContextMemory : CRandomIntegerContext {
+        Dictionary<string, List<int>> distribution = new Dictionary<string, List<int>>();
+
+
+        // This method is used to recall the value of a
+        // previously generated random number. The recall_name
+        // is used to look up the value in the distribution
+        // dictionary.
+        public int RecallValue(string recall_name, int index = 0) {
+            return distribution[recall_name][index];
+        }
+
+        // This method is used to generate a random number
+        // between 0 and 10. It also stores the generated
+        // number in the distribution dictionary with the
+        // key recall_name.
+        public int GetNextRandomNumber(string recall_name) {
+            int result = random.Next(10);
+            if (!distribution.ContainsKey(recall_name)) {
+                distribution[recall_name] = new List<int>();
+            }
+            distribution[recall_name].Add(result);
+            return result;
+        }
     }
 }

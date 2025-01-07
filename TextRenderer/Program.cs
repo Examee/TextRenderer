@@ -5,18 +5,18 @@ using TextRenderer;
 
 CScopeSystem scopeSystem = new CScopeSystem();
 CTextRenderer renderer = new CTextRenderer();
-RandomContext context = new RandomContext();
+CRandomIntegerContext integerContext = new CRandomIntegerContext();
 SerialPeaker serialPeaker = new SerialPeaker();
 
 // Register the serial macro with the parser
 renderer.RegisterTextMacro("SerialNumber", (_) =>
     serialPeaker.NextSerial().ToString());
 renderer.RegisterTextMacro("RandomInteger", (parameters) =>
-    context.GetNextRandomNumber(parameters[0]).ToString());
+    integerContext.GetNextRandomNumber(parameters[0]).ToString());
 
 renderer.RegisterTextMacro("Result", (parameters) => {
-    return (context.RecallValue(parameters[0]) + 
-            context.RecallValue(parameters[1])).ToString();
+    return (integerContext.RecallValue(parameters[0]) + 
+            integerContext.RecallValue(parameters[1])).ToString();
 });
 
 renderer.RegisterTextMacro("Question", (parameters) => {

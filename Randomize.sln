@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer2", "TextRender
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer4", "TextRenderer4\TextRenderer4.csproj", "{C4C6F71D-2A34-427C-A7DD-E30A2126A869}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReExpMacro", "ReExpMacro\ReExpMacro.csproj", "{AD2E278D-F571-45F1-83CA-FC68E477E2A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4C6F71D-2A34-427C-A7DD-E30A2126A869}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD2E278D-F571-45F1-83CA-FC68E477E2A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD2E278D-F571-45F1-83CA-FC68E477E2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD2E278D-F571-45F1-83CA-FC68E477E2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD2E278D-F571-45F1-83CA-FC68E477E2A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

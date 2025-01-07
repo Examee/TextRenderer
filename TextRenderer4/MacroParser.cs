@@ -17,7 +17,10 @@ namespace TextRenderer3 {
         // list of parameters separated by '$'
         // For example, the string '#s$param1$param2' will match the macro name 's',
         // and the parameters will be ['param1', 'param2']
-        private static readonly Regex MacroRegex = new Regex(@"^#(\w+)(?:\$(\w+))*");
+        private static readonly Regex MacroRegex = 
+            new Regex(@"(?:(^#)(\w+)(?:\$(\w+)(?:\[(\d+)\])?)*)|(:?(^&)(\w+)(?:\$(\w+)(?:\[(\d+)\])?)*)");
+
+
 
         // Singleton instance
         private static readonly Lazy<CMacroParser> instance = new Lazy<CMacroParser>(() => new CMacroParser());
@@ -28,7 +31,7 @@ namespace TextRenderer3 {
         // Public property to get the singleton instance
         public static CMacroParser Instance => instance.Value;
 
-        public string RenderString(CScope currentScope,string input) {
+        public string RenderString(CScope currentScope,string input, out string symtabID) {
             // Read the string and replace the macros with the appropriate values
             // Use the m_macros dictionary to look up the action for each macro
 
@@ -38,14 +41,14 @@ namespace TextRenderer3 {
             // The position variable is used to keep track of the current position
             // in the input string
             int position = 0;
-
+            symtabID = "";
             while (position < input.Length) {
                 string remainingText = input.Substring(position);
 
                 Match match;
                 // Check for macro
                 if ((match = MacroRegex.Match(remainingText)).Success) {
-                    string macroName = match.Groups[1].Value;
+                    string macroName = match.Groups[2].Value;
 
                     /* Explanation of the following line of code:
                      * Get the parameters for the macro (if any) and call the action
@@ -63,13 +66,27 @@ namespace TextRenderer3 {
                     enable LINQ expressions and Select projects each Capture to its Value
                     property.
                      */
-                    string[] parameters = match.Groups[2].Captures.
+                    string[] parameters = match.Groups[3].Captures.
                     Cast<Capture>().Select(c => c.Value).ToArray();
 
-                    Func<string[], string> action = currentScope.GetMacro(macroName);
+                    if (match.Groups[1].Value == "#") {
+                        Func<string[], string> action = currentScope.GetMacro(macroName);
 
-                    // Call the action function for the macro and append the result to the output
-                    result.Append(action(parameters));
+                        // Store the value acquired from the action function
+                        string value = action(parameters);
+                        currentScope.AddValue(parameters[0], value);
+                        symtabID = parameters[0];
+
+                        // Call the action function for the macro and append the result to the output
+                        result.Append(value);
+                    }
+                    else if (match.Groups[1].Value == "&") {
+                        // Acquire the value of the macro from the current scope
+                        string value = currentScope.GetValue(macroName);
+
+                        // Embed the value in the output
+                        result.Append(value);
+                    }
 
                     // Move the position to the end of the matched macro
                     position += match.Length;
@@ -80,7 +97,7 @@ namespace TextRenderer3 {
                     position++;
                 }
             }
-
+            
             return result.ToString();
         }
     }
