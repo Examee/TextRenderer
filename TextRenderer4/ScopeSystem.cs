@@ -17,7 +17,7 @@ namespace TextRenderer3 {
         Dictionary<string, CScope> m_scopes;
 
         // The root scope is the topmost scope in the symbol table
-        private CScope m_root;
+        private CExamScope m_root;
         // The current scope is the scope in which the current object is being built
         private CScope m_currentScope;
         public CScope MCurrentScope => m_currentScope;
@@ -43,20 +43,38 @@ namespace TextRenderer3 {
         // and has a parent scope from which this method is called. If the scope already
         // exists, the current scope is set to the existing scope. Otherwise, a new scope
         // is created and added to the symbol table
-        public CScope EnterScope(string scopeID, CScope parentScope) {
+        public CExamScope EnterExamScope() {
+            string scopeID = CExamScope.m_scopeID;
             if (m_scopes.ContainsKey(scopeID)) {
                 // If the scope already exists, set the current scope to the existing scope
                 SetCurrentScope(scopeID);
             }
             else {
                 // Create a new scope... 
-                CScope newScope = new CScope(scopeID, parentScope);
+                CExamScope newScope = new CExamScope();
                 // ...and add it to the symbol table
+                m_root = newScope;
                 m_scopes[scopeID] = newScope;
                 // Set the current scope to the new scope
                 SetCurrentScope(scopeID);
             }
-            return m_currentScope;
+            return (CExamScope)m_currentScope;
+        }
+
+        public CQuestionScope EnterQuestionScope(string scopeID, CScope parent) {
+            if (m_scopes.ContainsKey(scopeID)) {
+                // If the scope already exists, set the current scope to the existing scope
+                SetCurrentScope(scopeID);
+            } else {
+                // Create a new scope... 
+                CQuestionScope newScope = new CQuestionScope(scopeID, parent);
+                // ...and add it to the symbol table
+                m_scopes[scopeID] = newScope;
+                
+                // Set the current scope to the new scope
+                SetCurrentScope(scopeID);
+            }
+            return (CQuestionScope)m_currentScope;
         }
 
         // Set the current scope to the scope identified by the scopeID
@@ -84,17 +102,13 @@ namespace TextRenderer3 {
 
     }
 
+    public abstract class CScope{
+        // The exam scope contains a dictionary of macros applied on exam scope
+        Dictionary<string, Func<string[], string>> m_symbolTableMacros;
 
-    public class CScope {
-        // The symboltable contains multiple unique namespaces where in each
-        // namespace, names must be unique. For example in the exam 
-        // scope the question names belong to a distinct namespace and their
-        // names must be unique.
-        // The first string type parameter refers to the namespace
-        // and the second to the name of the object in that namespace
-        private Dictionary<string, Func<string[], string>> m_symbolTableMacros;
-
-        public Dictionary<string, string> m_symbolTable;
+        // The scope contains a dictionary for the questions that links question macro name 
+        // with the question actual name
+        Dictionary<string, string> m_symbolTable;
 
         // The parent symbol table is used to search for objects in the parent
         // scope if they are not found in the current scope
@@ -102,16 +116,21 @@ namespace TextRenderer3 {
 
         public CScope MParent => m_parent;
 
-        private string m_scopeID;
-        public string ScopeID => m_scopeID;
-
-        public CScope(string scopeID,CScope parent) {
+        protected CScope(CScope mParent) {
             m_symbolTableMacros = new Dictionary<string, Func<string[], string>>();
             m_symbolTable = new Dictionary<string, string>();
-            m_parent = parent;
-            m_scopeID = scopeID;
+            m_parent = mParent;
         }
+        public void AddMacro(string objectName, Func<string[], string> action) {
+            m_symbolTableMacros[objectName] = action;
+        }
+        public Func<string[], string> GetMacro(string objectName) {
 
+            if (m_symbolTableMacros.ContainsKey(objectName)) {
+                return m_symbolTableMacros[objectName];
+            }
+            throw new KeyNotFoundException("Object not found");
+        }
         public void AddValue(string key, string value) {
             m_symbolTable[key] = value;
         }
@@ -121,17 +140,23 @@ namespace TextRenderer3 {
             }
             throw new KeyNotFoundException("Object not found");
         }
+    }
+    
+    public class CExamScope :CScope{
+        
+        public const string m_scopeID="Exam";
+        public string ScopeID => m_scopeID;
 
-        public void AddMacro(string objectName, Func<string[], string> action) {
-            m_symbolTableMacros[objectName] = action;
+        public CExamScope(): base(null) {
+            
         }
+    }
 
-        public Func<string[], string> GetMacro(string objectName) {
-
-            if (m_symbolTableMacros.ContainsKey(objectName)) {
-                return m_symbolTableMacros[objectName];
-            }
-            throw new KeyNotFoundException("Object not found");
+    public class CQuestionScope : CScope {
+        string m_scopeID;
+        public string ScopeID => m_scopeID;
+        public CQuestionScope(string scopeID,CScope parent) : base(parent) {
+            m_scopeID = scopeID;
         }
     }
 }

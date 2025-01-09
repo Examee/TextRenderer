@@ -46,7 +46,7 @@ namespace TextRenderer3 {
             }
 
             void SetExamEnvironment() {
-                m_root.MScope = m_scopeSystem.EnterScope("Exam", null);
+                m_root.MScope = m_scopeSystem.EnterExamScope();
             }
         }
         
@@ -58,23 +58,23 @@ namespace TextRenderer3 {
 
             // Render the question ID using the macros of the parent scope
             string symtabId;
-            string questionID = m_macroParser.RenderString(MCurrentScope,questionid,out symtabId);
+            (string questionID, string[]? parameters) questionParameters = m_macroParser.RenderString(MCurrentScope,questionid);
 
             // Create question and append it to the exam
-            CreateQuestion(exam,questionID);
+            CreateQuestion(exam,questionParameters.questionID);
 
             // Add the question ID to the text block
-            CText textBlock = new CText(m_currentBlock as CExamCompositeBlock, 1);
-            textBlock.AddText(questionID);
+            CText.CreateTextBlock(questionParameters.questionID,
+                m_currentBlock,CQuestion.QUESTION_SET);
 
             // Change to question scope 
-            SetQuestionEnvironment();
+            SetQuestionEnvironment(questionParameters.questionID);
 
             // Initialize services for the question scope
             InitializeServices(initAction);
 
             // Return the question ID for future reference
-            return questionID;
+            return questionParameters.questionID;
 
             void CreateQuestion(CExam exam,string  questionID) {
                 CQuestion question = new CQuestion(questionID, exam);
@@ -87,12 +87,13 @@ namespace TextRenderer3 {
                 return exam;
             }
 
-            void SetQuestionEnvironment() {
-                m_scopeSystem.EnterScope(symtabId, MCurrentScope);
+            void SetQuestionEnvironment(string symtabId) {
+                MCurrentScope.AddValue(questionParameters.parameters[0], symtabId);
+                m_scopeSystem.EnterQuestionScope(symtabId, MCurrentScope);
             }
         }
 
-        public string AddSolution(string questionID, Action<CScopeSystem> initAction) {
+        public string AddSolution(string questionMacroID, Action<CScopeSystem> initAction) {
 
             CExam exam = m_currentBlock.GetParent<CExam>();
             m_scopeSystem.SetCurrentScope("Exam");
@@ -102,39 +103,31 @@ namespace TextRenderer3 {
             m_currentBlock = solution;
 
             // Switch to question environment
-
+            string questionID = m_macroParser.RenderString(MCurrentScope, questionMacroID).text;
             m_scopeSystem.SetCurrentScope(questionID);
 
             // Add the question ID to the text block
-            CText textBlock = new CText(m_currentBlock as CExamCompositeBlock, 1);
-            textBlock.AddText(questionID);
-
+            CText.CreateTextBlock(questionID, m_currentBlock, CSolution.SOLUTION_SET);
+            
             // Initialize services for the solution scope
             InitializeServices(initAction);
 
             return questionID;
         }
 
-        public CText AddText(string text) {
-
-            CText textBlock = 
-                new CText(m_currentBlock as CExamCompositeBlock,0);
-
-            string _text = m_macroParser.RenderString(MCurrentScope, text,out _);
-            textBlock.AddText(_text);
-
-            return textBlock;
+        public CText AddText(string text,int context) {
+            return CText.CreateTextBlock(text, m_currentBlock, context); ;
         }
 
-        public void AddNewLine() {
+        public void AddNewLine(int context) {
             CNewLine newLine = 
-                new CNewLine(m_currentBlock as CExamCompositeBlock, 0);
+                new CNewLine(m_currentBlock as CExamCompositeBlock, context);
             return;
         }
 
-        public string AddTextLine(string text) {
-            var textBlock = AddText(text);
-            AddNewLine();
+        public string AddTextLine(string text,int context) {
+            var textBlock = AddText(text,context);
+            AddNewLine(context);
             return text;
         }
         

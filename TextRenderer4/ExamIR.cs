@@ -10,7 +10,7 @@ namespace TextRenderer3 {
     public abstract class CExamBlock {
         public CExamBlock MParent { get; }
 
-        public CScope MScope { get; internal set; }
+        public CExamScope MScope { get; internal set; }
         
         public CExamBlock(CExamBlock mParent) {
             MParent = mParent;
@@ -72,7 +72,7 @@ namespace TextRenderer3 {
 
     public class CText : CExamBlock {
         StringBuilder m_text = new StringBuilder();
-        public CText(CExamCompositeBlock parent, int context) : base(parent) {
+        private CText(CExamCompositeBlock parent, int context) : base(parent) {
             parent.AddBlock(this, context);
         }
 
@@ -84,6 +84,12 @@ namespace TextRenderer3 {
         }
         public override string GetContent() {
             return m_text.ToString();
+        }
+
+        public static CText CreateTextBlock(string text,CExamBlock parent,int context) {
+            CText textBlock = new CText(parent as CExamCompositeBlock, context);
+            textBlock.AddText(text);
+            return textBlock;
         }
     }
 

@@ -4,6 +4,7 @@
 using System.Text;
 using Randomize;
 using TextRenderer3;
+using TextRenderer4;
 
 CExamBuilder examBuilder = new CExamBuilder();
 
@@ -29,13 +30,13 @@ examBuilder.AddQuestion("#QuestionCounter$A",5,
             integerContext.GetNextRandomNumber(parameters[0]).ToString());
     });
 
-examBuilder.AddText("Find the result of the following addition : ");
-examBuilder.AddNewLine();
-examBuilder.AddText("\t#SubQuestionCounter$a) ");
-examBuilder.AddText("#RandomInteger$a$b[0][1] + #RandomInteger$b[0][1]");
-examBuilder.AddNewLine();
-examBuilder.AddSolution("A", null);
-examBuilder.AddText("Solution to exercise #QuestionCounter$A : #Result$a$b");
+examBuilder.AddText("Find the result of the following addition : ",CQuestion.TEXT);
+examBuilder.AddNewLine(CQuestion.TEXT);
+examBuilder.AddText("\t#SubQuestionCounter$a) ", CQuestion.TEXT);
+examBuilder.AddText("#RandomInteger$a + #RandomInteger$b", CQuestion.TEXT);
+examBuilder.AddNewLine( CQuestion.TEXT);
+examBuilder.AddSolution("&A", null);
+examBuilder.AddText("Solution to exercise #QuestionCounter$A : #Result$a$b",CSolution.TEXT);
 Console.WriteLine(examBuilder.RenderExam());
 /*
 
