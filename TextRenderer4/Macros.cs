@@ -14,4 +14,12 @@ namespace TextRenderer3 {
             return m_serial;
         }
     }
+
+    public class CResult {
+
+        public string Result(string[] parameters) {
+            return "";
+        }
+
+    }
 }

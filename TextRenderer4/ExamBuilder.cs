@@ -116,7 +116,10 @@ namespace TextRenderer3 {
         }
 
         public CText AddText(string text,int context) {
-            return CText.CreateTextBlock(text, m_currentBlock, context); ;
+
+            (string questionID, string[]? parameters) questionParameters = m_macroParser.RenderString(MCurrentScope, text);
+
+            return CText.CreateTextBlock(questionParameters.questionID, m_currentBlock, context); ;
         }
 
         public void AddNewLine(int context) {

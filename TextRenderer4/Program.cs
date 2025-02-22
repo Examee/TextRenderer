@@ -8,9 +8,6 @@ using TextRenderer4;
 
 CExamBuilder examBuilder = new CExamBuilder();
 
-
-
-
 examBuilder.AddExam((scopesystem) => {
     SerialPeaker serialPeaker = new SerialPeaker();
     scopesystem.AddMacroToCurrentScope("QuestionCounter", (_) =>
@@ -35,7 +32,14 @@ examBuilder.AddNewLine(CQuestion.TEXT);
 examBuilder.AddText("\t#SubQuestionCounter$a) ", CQuestion.TEXT);
 examBuilder.AddText("#RandomInteger$a + #RandomInteger$b", CQuestion.TEXT);
 examBuilder.AddNewLine( CQuestion.TEXT);
-examBuilder.AddSolution("&A", null);
+examBuilder.AddSolution("&A", (scopesystem) => {
+    // Initialize Service
+    CResult result = new CResult();
+    // Store the service into symbol table
+    scopesystem.AddMacroToCurrentScope("Result", (parameters) => {
+        return result.Result(parameters);
+    });
+});
 examBuilder.AddText("Solution to exercise #QuestionCounter$A : #Result$a$b",CSolution.TEXT);
 Console.WriteLine(examBuilder.RenderExam());
 /*

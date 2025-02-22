@@ -17,12 +17,10 @@ namespace TextRenderer3 {
         // list of parameters separated by '$'
         // For example, the string '#s$param1$param2' will match the macro name 's',
         // and the parameters will be ['param1', 'param2']
-        private static readonly Regex MacroRegexDefinition = 
+        private static readonly Regex MacroRegexDefinition =
             new Regex(@"(?:(^#)(\w+)(?:\$(\w+)(?:\[(\d+)\])?)*)");
         private static readonly Regex MacroRegexReference =
             new Regex(@"(?:^&(\w+))");
-
-
 
         // Singleton instance
         private static readonly Lazy<CMacroParser> instance = new Lazy<CMacroParser>(() => new CMacroParser());
@@ -33,13 +31,13 @@ namespace TextRenderer3 {
         // Public property to get the singleton instance
         public static CMacroParser Instance => instance.Value;
 
-        public (string text, string[]? parameters) RenderString(CScope currentScope,string input) {
+        public (string text, string[]? parameters) RenderString(CScope currentScope, string input) {
             // Read the string and replace the macros with the appropriate values
             // Use the m_macros dictionary to look up the action for each macro
 
             // The result string will be built up as we process the input string
             StringBuilder result = new StringBuilder();
-            string[] parameters=null;
+            string[] parameters = null;
 
             // The position variable is used to keep track of the current position
             // in the input string
@@ -56,12 +54,12 @@ namespace TextRenderer3 {
                      * Get the parameters for the macro (if any) and call the action
                      * If the input string is "#s$param1$param2", and the regular expression
                      * matches this string, the Groups collection might look like this:
-                       •	Groups[0]: "#s$param1$param2" (entire match)
-                       •	Groups[1]: "s" (macro name)
-                       •	Groups[2]: "param1" (first parameter)
-                       •	Groups[3]: "param2" (second parameter)
+                       • Groups[0]: "#s$param1$param2" (entire match)
+                       • Groups[1]: "#" (macro symbol)
+                       • Groups[2]: "s" (macro name)
+                       • Groups[3]: "param1" , "param2" etc (parameters)                       
                        After applying the line of code:
-                       •	parameters will be an array containing ["param1", "param2"].
+                       • parameters will be an array containing ["param1", "param2"].
                        This array is then used to call the macro's action function, which 
                        generates the replacement value for the macro in the input string.
                     Cast converts the CaptureCollection to an IEnumerable<Capture> to 
@@ -76,13 +74,10 @@ namespace TextRenderer3 {
 
                         // Store the value acquired from the action function
                         string value = action(parameters);
-                        /*currentScope.AddValue(parameters[0], value);
-                            symtabID = parameters[0];*/
 
                         // Call the action function for the macro and append the result to the output
                         result.Append(value);
-                    }
-                    else if (match.Groups[1].Value == "&") {
+                    } else if (match.Groups[1].Value == "&") {
                         // Acquire the value of the macro from the current scope
                         string value = currentScope.GetValue(macroName);
 
@@ -92,23 +87,22 @@ namespace TextRenderer3 {
 
                     // Move the position to the end of the matched macro
                     position += match.Length;
-                }
-                else if ((match = MacroRegexReference.Match(remainingText)).Success) {
+                } else if ((match = MacroRegexReference.Match(remainingText)).Success) {
                     string macroName = match.Groups[1].Value;
                     string value = currentScope.GetValue(macroName);
                     result.Append(value);
                     // Move the position to the end of the matched macro
                     position += match.Length;
                 }
-                // Plain text
-                else {
+                  // Plain text
+                  else {
                     result.Append(remainingText[0]);
                     position++;
                 }
 
             }
-            
-            return (result.ToString(),parameters);
+
+            return (result.ToString(), parameters);
         }
     }
 }
