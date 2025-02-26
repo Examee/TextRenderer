@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace TextRenderer3 {
     // This class is used to parse a string and replace macros with
@@ -77,6 +72,9 @@ namespace TextRenderer3 {
 
                         // Call the action function for the macro and append the result to the output
                         result.Append(value);
+
+                        // Store macro parameters to symbol table.
+                        currentScope.AddValue(parameters[0], value);
                     } else if (match.Groups[1].Value == "&") {
                         // Acquire the value of the macro from the current scope
                         string value = currentScope.GetValue(macroName);

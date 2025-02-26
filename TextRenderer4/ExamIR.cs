@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextRenderer4;
+﻿using System.Text;
 
 namespace TextRenderer3 {
     // Represents a block of text in the exam

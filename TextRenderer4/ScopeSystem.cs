@@ -124,21 +124,28 @@ namespace TextRenderer3 {
         public void AddMacro(string objectName, Func<string[], string> action) {
             m_symbolTableMacros[objectName] = action;
         }
-        public Func<string[], string> GetMacro(string objectName) {
-
-            if (m_symbolTableMacros.ContainsKey(objectName)) {
+        public Func<string[], string> GetMacro(string objectName)
+        {
+            if (m_symbolTableMacros.ContainsKey(objectName))
+            {
                 return m_symbolTableMacros[objectName];
             }
-            throw new KeyNotFoundException("Object not found");
+            if (m_parent != null)
+            {
+                return m_parent.GetMacro(objectName);
+            }
+            throw new KeyNotFoundException($"Macro '{objectName}' not found.");
         }
         public void AddValue(string key, string value) {
             m_symbolTable[key] = value;
         }
-        public string GetValue(string key) {
-            if (m_symbolTable.ContainsKey(key)) {
+        public string GetValue(string key)
+        {
+            if (m_symbolTable.ContainsKey(key))
+            {
                 return m_symbolTable[key];
             }
-            throw new KeyNotFoundException("Object not found");
+            throw new KeyNotFoundException($"Object '{key}' not found in scope {this}.");
         }
     }
     
